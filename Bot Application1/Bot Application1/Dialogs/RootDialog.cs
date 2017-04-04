@@ -76,10 +76,16 @@ namespace BotApplication1
                     Value = "Link to Menu"
                 };
 
+                dish.Calories = 500;
+                dish.Allergen = "Nüsse, Gluten";
+
+                var cardText = $"Price: {dish.Price.ToString("0.00")}€ | Kalorien: {dish.Calories} kcal | Allergene: {dish.Allergen}";
+
                 HeroCard resultCard = new HeroCard()
                 {
+                    Images = new List<CardImage> { new CardImage("https://thumbs.dreamstime.com/t/italian-food-meals-set-products-other-elements-cuisine-50899935.jpg") },
                     Title = dish.Dishes,
-                    Text = dish.Price.ToString(),
+                    Text = cardText,
                     Subtitle = dish.Location,
                     Buttons = new List<CardAction> { linkButton }
                 };

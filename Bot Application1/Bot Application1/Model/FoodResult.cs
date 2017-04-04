@@ -29,5 +29,9 @@ namespace Bot_Application1.Model
         public bool IsDailySpecial { get; set; }
 
         public string Kitchen { get; set; }
+
+        public int Calories { get; set; }
+
+        public string Allergen { get; set; }
     }
 }
