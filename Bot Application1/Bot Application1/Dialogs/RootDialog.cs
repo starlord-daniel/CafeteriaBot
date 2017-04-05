@@ -66,6 +66,7 @@ namespace BotApplication1
             m.Type = "message";
             m.Attachments = new List<Attachment>();
             m.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+            m.TextFormat = TextFormatTypes.Markdown;
 
             foreach (var dish in menuResponse.AvailableFood)
             {
@@ -73,13 +74,16 @@ namespace BotApplication1
                 {
                     Title = "Url",
                     Type = "openUrl",
-                    Value = "Link to Menu"
+                    Value = "http://www.bing.com"
                 };
 
+                
                 dish.Calories = 500;
                 dish.Allergen = "Nüsse, Gluten";
 
                 var cardText = $"Price: {dish.Price.ToString("0.00")}€ | Kalorien: {dish.Calories} kcal | Allergene: {dish.Allergen}";
+
+                if (dish.IsDailySpecial) { cardText = "*Angebot* | " + cardText; }
 
                 HeroCard resultCard = new HeroCard()
                 {
