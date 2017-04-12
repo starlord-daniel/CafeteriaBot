@@ -7,6 +7,7 @@ using System.Web;
 
 namespace Bot_Application1.Model
 {
+    [Serializable]
     public static class SqlConnector
     {
         /// <summary>
@@ -33,6 +34,11 @@ namespace Bot_Application1.Model
                         var isDailySpecial = Convert.ToBoolean(reader["ISDAILYSPECIAL"].ToString());
                         var kitchen = reader["KITCHEN"].ToString();
                         var imageUrl = reader["IMAGEURL"].ToString();
+                        var allergenes = reader["ALLERGEN"].ToString();
+                        var calories = Convert.ToInt32(reader["CALORIES"]);
+                        var date = Convert.ToDateTime(reader["DATE"]);
+                        var menuUrl = reader["MENUURL"].ToString();
+
 
                         availableFood.Add(new AvailableFood
                         {
@@ -41,7 +47,11 @@ namespace Bot_Application1.Model
                             IsDailySpecial = isDailySpecial,
                             Kitchen = kitchen,
                             Location = location,
-                            Price = price
+                            Price = price,
+                            Allergen = allergenes,
+                            Calories = calories,
+                            Date = date,
+                            MenuUrl = menuUrl
                         });
                     }
 

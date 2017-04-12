@@ -33,5 +33,7 @@ namespace Bot_Application1.Model
         public int Calories { get; set; }
 
         public string Allergen { get; set; }
+
+        public string MenuUrl { get; set; }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Bot_Application1;
+using Bot_Application1.Dialogs;
 using Bot_Application1.Model;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Connector;
@@ -11,6 +12,8 @@ namespace BotApplication1
     [Serializable]
     public class RootDialog : IDialog<object>
     {
+        List<string> welcomeOptionList = new List<string> { "Menue", "Allergies" };
+
         public async Task StartAsync(IDialogContext context)
         {
             /* Wait until the first message is received from the conversation and call MessageReceivedAsync
@@ -20,24 +23,20 @@ namespace BotApplication1
 
         private async Task MessageReceivedAsync(IDialogContext context, IAwaitable<IMessageActivity> result)
         {
-            /* When MessageReceivedAsync is called, it's passed an IAwaitable<IMessageActivity>. To get the message,
-               await the result. */
-            var message = await result;
-
-            context.Call(new MenuDialog(), this.MenueDialogResumeAfter);
-            //await this.SendWelcomeMessageAsync(context); // Alternative for multiple options
+            //context.Call(new MenuDialog(), this.MenueDialogResumeAfter);
+            await this.SendWelcomeMessageAsync(context); // Alternative for multiple options
         }
 
         private async Task SendWelcomeMessageAsync(IDialogContext context)
         {
-            context.Call(new MenuDialog(), this.MenueDialogResumeAfter);
-            //PromptDialog.Choice(
-            //    context: context,
-            //    resume: this.SendWelcomeMessageResumeAfter,
-            //    options: new List<string> { "Menüs" },
-            //    prompt: "Hi, please tell me what you want to eat today",
-            //    retry: "Unfortunately this option is not available",
-            //    attempts: 2);
+            //context.Call(new MenuDialog(), this.MenueDialogResumeAfter);
+            PromptDialog.Choice(
+                context: context,
+                resume: this.SendWelcomeMessageResumeAfter,
+                options: welcomeOptionList,
+                prompt: "Hi, do you want to know the menu or give me any allergies to consider?",
+                retry: "Unfortunately this option is not available",
+                attempts: 2);
         }
 
         private async Task SendWelcomeMessageResumeAfter(IDialogContext context, IAwaitable<string> result)
@@ -46,8 +45,17 @@ namespace BotApplication1
             {
                 var selectedOption = await result;
 
-                context.Call(new MenuDialog(), this.MenueDialogResumeAfter);
-
+                switch (selectedOption)
+                {
+                    case "Menue":
+                        context.Call(new MenuDialog(), this.MenueDialogResumeAfter);
+                        break;
+                    case "Allergies":
+                        context.Call(new AllergyDialog(), this.AllergyDialogResumeAfter);
+                        break;
+                    default:
+                        break;
+                }
             }
             catch (Exception)
             {
@@ -55,6 +63,18 @@ namespace BotApplication1
 
                 await this.StartAsync(context);
             }
+        }
+
+        private async Task AllergyDialogResumeAfter(IDialogContext context, IAwaitable<List<string>> result)
+        {
+            // Get result
+            List<string> allergies = await result;
+
+            // Save Allergies
+            context.ConversationData.SetValue("Allergies", allergies);
+
+            // Forward to Menu selection
+            context.Call(new MenuDialog(), this.MenueDialogResumeAfter);
         }
 
         private async Task MenueDialogResumeAfter(IDialogContext context, IAwaitable<FoodResult> result)
@@ -70,20 +90,20 @@ namespace BotApplication1
 
             foreach (var dish in menuResponse.AvailableFood)
             {
+                // Check for allergies
+                if (DishIncludesAllergy(dish, context))
+                    continue;
+
                 CardAction linkButton = new CardAction()
                 {
-                    Title = "Url",
+                    Title = "Link to menu",
                     Type = "openUrl",
-                    Value = "http://www.bing.com"
+                    Value = dish.MenuUrl
                 };
 
-                
-                dish.Calories = 500;
-                dish.Allergen = "Nüsse, Gluten";
+                var cardText = $"Price: {dish.Price.ToString("0.00")}€ | Calories: {dish.Calories} kcal | Allergenes: {dish.Allergen}";
 
-                var cardText = $"Price: {dish.Price.ToString("0.00")}€ | Kalorien: {dish.Calories} kcal | Allergene: {dish.Allergen}";
-
-                if (dish.IsDailySpecial) { cardText = "*Angebot* | " + cardText; }
+                if (dish.IsDailySpecial) { cardText = "*Special offer* | " + cardText; }
 
                 HeroCard resultCard = new HeroCard()
                 {
@@ -100,6 +120,25 @@ namespace BotApplication1
 
             await context.PostAsync(m);
             await this.StartAsync(context);
+        }
+
+        /// <summary>
+        /// Check the dish, if the included allergies collide with the users allergies.
+        /// </summary>
+        /// <param name="dish">The current dish to be analysed.</param>
+        /// <param name="context">The message context, containing the stored allergies</param>
+        /// <returns>Bool, if the dish contains one of the users allergies.</returns>
+        private bool DishIncludesAllergy(AvailableFood dish, IDialogContext context)
+        {
+            var userAllergyList = context.ConversationData.Get<List<string>>("Allergies");
+
+            foreach (var allergy in userAllergyList)
+            {
+                if (dish.Allergen.Contains(allergy))
+                    return true;
+            }
+
+            return false;
         }
     }
 }
