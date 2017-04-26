@@ -23,13 +23,11 @@ namespace BotApplication1
 
         private async Task MessageReceivedAsync(IDialogContext context, IAwaitable<IMessageActivity> result)
         {
-            //context.Call(new MenuDialog(), this.MenueDialogResumeAfter);
             await this.SendWelcomeMessageAsync(context); // Alternative for multiple options
         }
 
         private async Task SendWelcomeMessageAsync(IDialogContext context)
         {
-            //context.Call(new MenuDialog(), this.MenueDialogResumeAfter);
             PromptDialog.Choice(
                 context: context,
                 resume: this.SendWelcomeMessageResumeAfter,

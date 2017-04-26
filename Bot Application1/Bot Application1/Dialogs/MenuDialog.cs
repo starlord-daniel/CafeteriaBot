@@ -7,7 +7,6 @@ using System.Linq;
 using System.Threading.Tasks;
 
 
-
 namespace Bot_Application1
 {
     [Serializable]
@@ -60,6 +59,7 @@ namespace Bot_Application1
                 case "menueLookUp.intent.showCosts":
                     {
                         var costEntity = (from l in luisResult.entities where l.type == "highestAmount" select l).FirstOrDefault();
+                        var c = luisResult.entities.Where(x => x.type == "highestAmount").Select(x => x).First();  
 
                         if (costEntity != null)
                         {
