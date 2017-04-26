@@ -81,45 +81,69 @@ namespace BotApplication1
         {
             var menuResponse = await result;
 
-            var m = context.MakeMessage();
-            m.Recipient = context.MakeMessage().From;
-            m.Type = "message";
-            m.Attachments = new List<Attachment>();
-            m.AttachmentLayout = AttachmentLayoutTypes.Carousel;
-            m.TextFormat = TextFormatTypes.Markdown;
+            var finalMessage = context.MakeMessage();
+            finalMessage.Recipient = context.MakeMessage().From;
+            finalMessage.Type = "message";
+            finalMessage.Attachments = new List<Attachment>();
+            finalMessage.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+            finalMessage.TextFormat = TextFormatTypes.Markdown;
 
-            foreach (var dish in menuResponse.AvailableFood)
+            if (menuResponse.AvailableFood.Count > 0)
             {
-                // Check for allergies
-                if (DishIncludesAllergy(dish, context))
-                    continue;
-
-                CardAction linkButton = new CardAction()
+                foreach (var dish in menuResponse.AvailableFood)
                 {
-                    Title = "Link to menu",
-                    Type = "openUrl",
-                    Value = dish.MenuUrl
-                };
+                    // Check for allergies
+                    if (DishIncludesAllergy(dish, context))
+                        continue;
 
-                var cardText = $"Price: {dish.Price.ToString("0.00")}€ | Calories: {dish.Calories} kcal | Allergenes: {dish.Allergen}";
+                    CardAction linkButton = new CardAction()
+                    {
+                        Title = "Link to menu",
+                        Type = "openUrl",
+                        Value = dish.MenuUrl
+                    };
 
-                if (dish.IsDailySpecial) { cardText = "*Special offer* | " + cardText; }
+                    var cardText = "";
 
-                HeroCard resultCard = new HeroCard()
-                {
-                    Images = new List<CardImage> { new CardImage("https://thumbs.dreamstime.com/t/italian-food-meals-set-products-other-elements-cuisine-50899935.jpg") },
-                    Title = dish.Dishes,
-                    Text = cardText,
-                    Subtitle = dish.Location,
-                    Buttons = new List<CardAction> { linkButton }
-                };
+                    if (dish.Allergen != "")
+                    {
+                        cardText = $"Price: {dish.Price.ToString("0.00")}€ | Calories: {dish.Calories} kcal | Allergenes: {dish.Allergen}";
+                    }
+                    else
+                    {
+                        cardText = $"Price: {dish.Price.ToString("0.00")}€ | Calories: {dish.Calories} kcal";
 
-                Attachment cardAttachment = resultCard.ToAttachment();
-                m.Attachments.Add(cardAttachment);
+                    }
+
+                    var foodImage = dish.ImageURL == "" ?
+                        "https://thumbs.dreamstime.com/t/italian-food-meals-set-products-other-elements-cuisine-50899935.jpg" :
+                        dish.ImageURL;
+
+                    if (dish.IsDailySpecial) { cardText = "(*)  " + cardText; }
+
+                    HeroCard resultCard = new HeroCard()
+                    {
+                        Images = new List<CardImage> { new CardImage(foodImage) },
+                        Title = dish.Dishes,
+                        Text = cardText,
+                        Subtitle = dish.Location,
+                        Buttons = new List<CardAction> { linkButton }
+                    };
+
+                    Attachment cardAttachment = resultCard.ToAttachment();
+                    finalMessage.Attachments.Add(cardAttachment);
+                }
+
+                await context.PostAsync(finalMessage);
+                await this.StartAsync(context);
+            }
+            else
+            {
+                await context.PostAsync("No matching dishes found. Either loosen your filter or order from [Foodora](https://www.foodora.com/).");
+                await this.StartAsync(context);
             }
 
-            await context.PostAsync(m);
-            await this.StartAsync(context);
+            
         }
 
         /// <summary>
@@ -130,15 +154,23 @@ namespace BotApplication1
         /// <returns>Bool, if the dish contains one of the users allergies.</returns>
         private bool DishIncludesAllergy(AvailableFood dish, IDialogContext context)
         {
-            var userAllergyList = context.ConversationData.Get<List<string>>("Allergies");
-
-            foreach (var allergy in userAllergyList)
+            try
             {
-                if (dish.Allergen.Contains(allergy))
-                    return true;
-            }
+                var userAllergyList = context.ConversationData.Get<List<string>>("Allergies");
 
-            return false;
+                foreach (var allergy in userAllergyList)
+                {
+                    if (dish.Allergen.Contains(allergy.ToLower()))
+                        return true;
+                }
+
+                return false;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+                
         }
     }
 }

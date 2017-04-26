@@ -25,7 +25,12 @@ namespace Bot_Application1.Dialogs
             try
             {
                 var seperatedByComma = message.Text.Split(',');
-                allergyList = seperatedByComma.ToList();
+                allergyList = new List<string>();
+
+                foreach (var allergy in seperatedByComma.ToList())
+                {
+                    allergyList.Add(allergy.Trim());
+                }
 
                 // Return the list of allergies
                 context.Done(allergyList);

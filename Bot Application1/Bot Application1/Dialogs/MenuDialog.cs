@@ -59,11 +59,11 @@ namespace Bot_Application1
                     break;
                 case "menueLookUp.intent.showCosts":
                     {
-                        var entity = (from l in luisResult.entities where l.type == "highestAmount" select l).FirstOrDefault();
+                        var costEntity = (from l in luisResult.entities where l.type == "highestAmount" select l).FirstOrDefault();
 
-                        if (entity != null)
+                        if (costEntity != null)
                         {
-                            foodResult = foodOptions.Where(x => x.Price < Convert.ToDecimal(entity.entity)).ToList();
+                            foodResult = foodOptions.Where(x => x.Price < Convert.ToDecimal(costEntity.entity)).ToList();
                         }
                         else
                         {
@@ -73,11 +73,11 @@ namespace Bot_Application1
                     break;
                 case "menueLookUp.intent.showCalories":
                     {
-                        var entity = (from l in luisResult.entities where l.type == "calories" select l).FirstOrDefault();
+                        var calEntity = (from l in luisResult.entities where l.type == "calories" select l).FirstOrDefault();
 
-                        if (entity != null)
+                        if (calEntity != null)
                         {
-                            foodResult = foodOptions.Where(x => x.Calories < Convert.ToDecimal(entity.entity)).ToList();
+                            foodResult = foodOptions.Where(x => x.Calories < Convert.ToDecimal(calEntity.entity)).ToList();
                         }
                         else
                         {
