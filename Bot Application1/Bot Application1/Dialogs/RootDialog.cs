@@ -78,6 +78,7 @@ namespace BotApplication1
         private async Task MenueDialogResumeAfter(IDialogContext context, IAwaitable<FoodResult> result)
         {
             var menuResponse = await result;
+            var maxResults = 10;
 
             var finalMessage = context.MakeMessage();
             finalMessage.Recipient = context.MakeMessage().From;
@@ -88,8 +89,13 @@ namespace BotApplication1
 
             if (menuResponse.AvailableFood.Count > 0)
             {
+                int i = 0;
+
                 foreach (var dish in menuResponse.AvailableFood)
                 {
+                    if (i >= maxResults)
+                        break;
+                    
                     // Check for allergies
                     if (DishIncludesAllergy(dish, context))
                         continue;
@@ -130,6 +136,8 @@ namespace BotApplication1
 
                     Attachment cardAttachment = resultCard.ToAttachment();
                     finalMessage.Attachments.Add(cardAttachment);
+
+                    i++;
                 }
 
                 await context.PostAsync(finalMessage);
