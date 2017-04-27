@@ -38,7 +38,11 @@ namespace Bot_Application1.Model
                         var calories = Convert.ToInt32(reader["CALORIES"]);
                         var date = Convert.ToDateTime(reader["DATE"]);
                         var menuUrl = reader["MENUURL"].ToString();
+                        var isDailyDish = Convert.ToBoolean(reader["ISDAILYDISH"]);
 
+                        // Ask if the dish as available today (Either it is a daily dish or the date is today)
+                        if (isDailyDish == false && DateTime.Compare(date, DateTime.Today) != 0)
+                            continue;
 
                         availableFood.Add(new AvailableFood
                         {
@@ -51,7 +55,8 @@ namespace Bot_Application1.Model
                             Allergen = allergenes,
                             Calories = calories,
                             Date = date,
-                            MenuUrl = menuUrl
+                            MenuUrl = menuUrl,
+                            IsDailyDish = isDailyDish
                         });
                     }
 

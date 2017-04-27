@@ -35,5 +35,7 @@ namespace Bot_Application1.Model
         public string Allergen { get; set; }
 
         public string MenuUrl { get; set; }
+
+        public bool IsDailyDish { get; set; }
     }
 }
