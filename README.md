@@ -87,7 +87,7 @@ To extend the LUIS services the following steps have to be performed:
 
     - [Optional]: Follow the similar steps with "Entities" instead of Intent to create new entities. You don't have to put in new utterances, you just add the entities to your intent
 
-3. Locate theHandleLuisMessage(IDialogContext context) in the [MenuDialog](Bot%20Application1\Bot%20Application1\Dialogs\MenuDialog.cs). It should look similar to this: 
+3. Locate theHandleLuisMessage(IDialogContext context) in the [MenuDialog](tree/master/Bot%20Application1/Bot%20Application1/Dialogs/MenuDialog.cs). It should look similar to this: 
 
 ```csharp
 private Task HandleLuisMessage(IDialogContext context)
