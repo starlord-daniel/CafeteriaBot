@@ -33,7 +33,7 @@
 
 ### High Level Architecture ###
 
-![Architecture Diagram](images/2017_04_Daimler_Cafeteria_Bot/Cafeteria_Bot_Architecture.png)
+![Architecture Diagram](https://github.com/starlord-daniel/CafeteriaBot/blob/master/images/2017_04_Daimler_Cafeteria_Bot/Cafeteria_Bot_Architecture.PNG)
 
 ### Bot Process Flow Diagram ###
 
