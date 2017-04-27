@@ -33,7 +33,7 @@
 
 ### High Level Architecture ###
 
- ![Architecture Diagram]()
+![Architecture Diagram](images/2017_04_Daimler_Cafeteria_Bot/Cafeteria_Bot_Architecture.png)
 
 ### Bot Process Flow Diagram ###
 
@@ -52,7 +52,6 @@ To get started working with bots, take a look at the following links first:
 The implemented bot consist of multiple dialogs, these are:
 
 - Root Dialog: The main dialog which handles the routing of the requests, sends the welcome message and displays the results in a carousel form
-
 
 - Menue Dialog: 
 
