@@ -164,7 +164,7 @@ case "YOUR_INTENT_NAME":
     break;
 ```
 
-5. That's it. Now the last step is to connect your LUISNow you can filter the result with the help of the new intent. To do this, go to the LuisApi code and insert your credentials.
+5. That's it. Now the last step is to connect your LUIS model. To do this, go to the [LuisApi](https://github.com/starlord-daniel/CafeteriaBot/blob/master/Bot%20Application1/Bot%20Application1/Model/LuisApi.cs) code and insert your credentials.
 
 ```csharp
 public static class LuisApi
