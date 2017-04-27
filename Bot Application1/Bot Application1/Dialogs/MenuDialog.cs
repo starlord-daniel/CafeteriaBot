@@ -32,7 +32,7 @@ namespace Bot_Application1
             await this.HandleLuisMessage(context);
         }
 
-        private async Task HandleLuisMessage(IDialogContext context)
+        private Task HandleLuisMessage(IDialogContext context)
         {
             List<AvailableFood> foodResult = new List<AvailableFood>();
 
@@ -93,6 +93,8 @@ namespace Bot_Application1
             }
 
             context.Done(new FoodResult { AvailableFood = foodResult });
+
+            return Task.CompletedTask;
         }
 
         public async Task MainDish(IDialogContext context, LuisResult result)

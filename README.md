@@ -33,7 +33,7 @@
 
 ### High Level Architecture ###
 
- ![Architecture Diagram]
+ ![Architecture Diagram]()
 
 ### Bot Process Flow Diagram ###
 
@@ -58,6 +58,118 @@ The implemented bot consist of multiple dialogs, these are:
 - Menue Dialog: 
 
 - Allergy Dialog: 
+
+## Extension Capabilities ##
+
+### LUIS ### 
+
+To extend the LUIS services the following steps have to be performed:
+
+1. [Optional] Export the current LUIS model from the [LUIS website](https://www.luis.ai/applications) for another developer to import.
+
+    - Export the model
+
+        ![LUIS Export](images/2017_04_Daimler_Cafeteria_Bot/LUIS_Export.png)
+
+    - Import the model
+
+        ![LUIS Import](images/2017_04_Daimler_Cafeteria_Bot/LUIS_Import.png)
+
+2. Create a new intent:
+
+    - To create a new intent open your LUIS model from the "My Apps" list. In the following screen, go to Intents and click on "Add Intent"
+
+        ![Add Intent](images/2017_04_Daimler_Cafeteria_Bot/LUIS_Add_Intent.png)
+    
+    - Type a name for the new intent. This will be used later in your bot code
+
+    - Type the utterances that should invoke your intent
+
+    - [Optional]: Follow the similar steps with "Entities" instead of Intent to create new entities. You don't have to put in new utterances, you just add the entities to your intent
+
+3. Locate theHandleLuisMessage(IDialogContext context) in the [MenuDialog](Bot%20Application1\Bot%20Application1\Dialogs\MenuDialog.cs). It should look similar to this: 
+
+```csharp
+private Task HandleLuisMessage(IDialogContext context)
+{
+    List<AvailableFood> foodResult = new List<AvailableFood>();
+
+    var foodOptions = SqlConnector.GetDishes();
+
+    switch (luisResult.topScoringIntent.intent)
+    {
+        // Just show menu for selected food type (e.g. Italian)
+        case "menueLookUp.intent.showMenue":
+            {
+                var entity = (from l in luisResult.entities where l.type == "food" select l).FirstOrDefault();
+                // var entity = luisResult.entities.Where(x => x.type == "food").FirstOrDefault();
+
+                if (entity != null)
+                {
+                    foodResult = foodOptions.Where(x => x.Kitchen.ToLower() == entity.entity).ToList();
+                }
+                else
+                {
+                    foodResult = foodOptions.Where(x => x.IsDailySpecial == true).ToList();
+                }
+            }
+            break;
+        case "menueLookUp.intent.showCosts":
+            {
+                var costEntity = (from l in luisResult.entities where l.type == "highestAmount" select l).FirstOrDefault();
+
+                if (costEntity != null)
+                {
+                    foodResult = foodOptions.Where(x => x.Price < Convert.ToDecimal(costEntity.entity)).ToList();
+                }
+                else
+                {
+                    foodResult = foodOptions.Where(x => x.IsDailySpecial == true).ToList();
+                }
+            }
+            break;
+        case "menueLookUp.intent.showCalories":
+            {
+                var calEntity = (from l in luisResult.entities where l.type == "calories" select l).FirstOrDefault();
+
+                if (calEntity != null)
+                {
+                    foodResult = foodOptions.Where(x => x.Calories < Convert.ToDecimal(calEntity.entity)).ToList();
+                }
+                else
+                {
+                    foodResult = foodOptions.Where(x => x.IsDailySpecial == true).ToList();
+                }
+            }
+            break;
+        default:
+            {
+
+                foodResult = foodOptions.Where(x => x.IsDailySpecial == true).ToList();
+            }
+            break;
+    }
+
+    context.Done(new FoodResult { AvailableFood = foodResult });
+
+    return Task.CompletedTask;
+}
+```
+
+4. Add a new case for your newly created intent. Make sure to set the "YOUR_INTENT_NAME" string to the name of the previously created intent.
+
+```csharp
+case "YOUR_INTENT_NAME":
+    // Code has to set the value of foodResult, like:
+    foodResult = foodOptions.ToList();
+    break;
+```
+
+5. That's it. Now you can filter the result with the help of the new intent. Of course you have to make sure to change the code inside the new case. Take a look at the other cases for tipps.
+
+### Dialogs ###
+
+### SQL Database and Properties ###
 
 # Core Bot Capabilities #
 
