@@ -13,8 +13,8 @@ namespace Bot_Application1.Model
         {
             LuisResult luisResponse;
 
-            string modelId = "4b5067ba-9efc-4bdd-986a-843779758686";
-            string subscriptionKey = "a5feea01c34f406bb3c5ece8b97692a4";
+            string modelId = "70dcaf7a-2f41-4d38-96fb-f144d482357c";
+            string subscriptionKey = "9b347736a5ef4f58ae5ae4d232154628";
 
             string luisUrl = $"https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/{modelId}?subscription-key={subscriptionKey}&verbose=true&q={query}";
 
