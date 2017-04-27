@@ -54,7 +54,6 @@ The implemented bot consist of multiple dialogs, these are:
 - Root Dialog: The main dialog which handles the routing of the requests, sends the welcome message and displays the results in a carousel form
 
 
-
 - Menue Dialog: 
 
 - Allergy Dialog: 
@@ -87,7 +86,7 @@ To extend the LUIS services the following steps have to be performed:
 
     - [Optional]: Follow the similar steps with "Entities" instead of Intent to create new entities. You don't have to put in new utterances, you just add the entities to your intent
 
-3. Locate theHandleLuisMessage(IDialogContext context) in the MenuDialog. It should look similar to this: 
+3. Locate theHandleLuisMessage(IDialogContext context) in the [MenuDialog](https://github.com/starlord-daniel/CafeteriaBot/blob/master/Bot%20Application1/Bot%20Application1/Dialogs/MenuDialog.cs). It should look similar to this: 
 
 ```csharp
 private Task HandleLuisMessage(IDialogContext context)
