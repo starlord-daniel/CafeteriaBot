@@ -86,7 +86,7 @@ To extend the LUIS services the following steps have to be performed:
 
     - [Optional]: Follow the similar steps with "Entities" instead of Intent to create new entities. You don't have to put in new utterances, you just add the entities to your intent
 
-3. Locate theHandleLuisMessage(IDialogContext context) in the [MenuDialog](https://github.com/starlord-daniel/CafeteriaBot/blob/master/Bot%20Application1/Bot%20Application1/Dialogs/MenuDialog.cs). It should look similar to this: 
+3. Locate the HandleLuisMessage(IDialogContext context) in the [MenuDialog](https://github.com/starlord-daniel/CafeteriaBot/blob/master/Bot%20Application1/Bot%20Application1/Dialogs/MenuDialog.cs). It should look similar to this: 
 
 ```csharp
 private Task HandleLuisMessage(IDialogContext context)
@@ -155,7 +155,7 @@ private Task HandleLuisMessage(IDialogContext context)
 }
 ```
 
-4. Add a new case for your newly created intent. Make sure to set the "YOUR_INTENT_NAME" string to the name of the previously created intent.
+4. Add a new case for your newly created intent. Make sure to set the "YOUR_INTENT_NAME" string to the name of the previously created intent. Of course you have to make sure to change the code inside the new case. Take a look at the other cases for tipps.
 
 ```csharp
 case "YOUR_INTENT_NAME":
@@ -164,7 +164,45 @@ case "YOUR_INTENT_NAME":
     break;
 ```
 
-5. That's it. Now you can filter the result with the help of the new intent. Of course you have to make sure to change the code inside the new case. Take a look at the other cases for tipps.
+5. That's it. Now the last step is to connect your LUISNow you can filter the result with the help of the new intent. To do this, go to the LuisApi code and insert your credentials.
+
+```csharp
+public static class LuisApi
+{
+    public static async Task<LuisResult> GetLuisResult(string query)
+    {
+        LuisResult luisResponse;
+
+        string modelId = "YOUR_MODEL_ID";
+        string subscriptionKey = "YOUR_SUBSCRIPTION_KEY";
+
+        string luisUrl = $"https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/{modelId}?subscription-key={subscriptionKey}&verbose=true&q={query}";
+
+        // Create a request for the URL.   
+        WebRequest request = WebRequest.Create(luisUrl);
+
+        // Get the response.  
+        WebResponse response = await request.GetResponseAsync();
+
+        // Get the stream containing content returned by the server.  
+        Stream dataStream = response.GetResponseStream();
+
+        // Open the stream using a StreamReader for easy access.  
+        StreamReader reader = new StreamReader(dataStream);
+
+        // Read the content.  
+        var responseFromServer = reader.ReadToEnd();
+        luisResponse = JsonConvert.DeserializeObject<LuisResult>(responseFromServer);
+
+        // Clean up the streams and the response.  
+        reader.Close();
+        response.Close();
+
+        // Display the content.  
+        return luisResponse;
+    }
+}
+```
 
 ### Dialogs ###
 
