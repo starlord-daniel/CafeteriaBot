@@ -131,6 +131,7 @@
     <Compile Include="Model\SqlConnector.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Dialogs\RootDialog.cs" />
+    <Compile Include="Security\Credentials.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />

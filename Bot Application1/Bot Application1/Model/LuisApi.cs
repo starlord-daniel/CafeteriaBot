@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web;
+using Bot_Application1.Security;
 
 namespace Bot_Application1.Model
 {
@@ -15,8 +16,8 @@ namespace Bot_Application1.Model
         {
             LuisResult luisResponse;
 
-            string modelId = "70dcaf7a-2f41-4d38-96fb-f144d482357c";
-            string subscriptionKey = "9b347736a5ef4f58ae5ae4d232154628";
+            string modelId = Credentials.LUIS_MODEL_ID;
+            string subscriptionKey = Credentials.LUIS_SUBSCRIPTION_KEY;
 
             string luisUrl = $"https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/{modelId}?subscription-key={subscriptionKey}&verbose=true&q={HttpUtility.HtmlEncode(query)}";
             
