@@ -2,11 +2,15 @@
 
 ## Solution Overview
 
+In a modern and rapidly changing environment it is crucial to get information fast and as conveniently as possible. This statement is not only true for business processes, but also for seemingly simple information as menu of the cafeteria. To provide all employees with a fast, convenient, easy-to-maintain and highly automated solution to get lunch information, the cafeteria bot was developed. 
+It allows a user to search and filter all menues across different locations for the optimal user satisfaction. It is therefor possible to filter for calories ("Food below 500 kcal"), price ("All food below 7€"), daily special and more. the user can additionally state his allergy information to just receive the meals he can enjoy.
+To achieve this, the user states his queries to the bot, which are then handled by the Cognitive Service [LUIS](https://www.luis.ai/) to extract the users intention and guide the bot to perform the filtering on a Azure SQL database, where the meal information is stored.
 
 ## Key technologies
 
 - [Microsoft Bot Framework](https://dev.botframework.com/)
 - [Microsoft Cognitive Services](https://www.microsoft.com/cognitive-services/) (LUIS = Language Understanding Intelligent Service)
+- [Azure SQL Database](https://azure.microsoft.com/en-us/services/sql-database/)
 
 ## Core team
 
@@ -18,26 +22,30 @@
 
 # Customer profile #
 
-
+Daimler Financial Services is the global financial services provider of Daimler AG, providing financing, leasing, insurance, fleet management, insurance services, banking and credit/debit cards services in more than 40 countries.
+More recently the company has expanded their portfolio to offer mobility services under the brands Car2Go, myTaxi, Mercedes-Benz Rent, and moovel.
+DFS is based in Stuttgart, with more than 6,500 employees, and with a contract volume of €58.1 billion as of 2007.
  
 # Problem statement #
 
-
+Currently, there is a cornucopia of unstructured information as pdfs, websites and more, which all display a variety of lunch information. The main problem is that none of these sources provides a condensed view of all locations and dishes there are for the employee to enjoy. Additionally, there are no means of filtering implemented into the meal data.
  
 # Solution and steps #
 
 ## Solution in general ## 
 
+The solution is a chatbot in combination with a model for language understanding ( [LUIS](https://www.luis.ai/) ) to allow any user to search and filter all menues across different locations for the optimal user satisfaction. It is therefor possible to filter for calories ("Food below 500 kcal"), price ("All food below 7€"), daily special and more. the user can additionally state his allergy information to just receive the meals he can enjoy.
+To achieve this, the user states his queries to the bot, which are then handled by the Cognitive Service to extract the users intention and guide the bot to perform the filtering on a Azure SQL database, where the meal information is stored.
 
 ## Architecture ##
 
 ### High Level Architecture ###
 
-![Architecture Diagram](https://github.com/starlord-daniel/CafeteriaBot/blob/master/images/2017_04_Daimler_Cafeteria_Bot/Cafeteria_Bot_Architecture.PNG)
+![Architecture Diagram](images/2017_04_Daimler_Cafeteria_Bot/Cafeteria_Bot_Architecture.PNG)
 
 ### Bot Process Flow Diagram ###
 
-![Bot Process Flow Diagram]
+![Bot Process Flow Diagram](images/2017_04_Daimler_Cafeteria_Bot/Cafeteria_Bot_Flow.png)
 
 # Technical delivery #
 This section will include the following details of how the solution was implemented.
@@ -51,11 +59,11 @@ To get started working with bots, take a look at the following links first:
 
 The implemented bot consist of multiple dialogs, these are:
 
-- Root Dialog: The main dialog which handles the routing of the requests, sends the welcome message and displays the results in a carousel form
+- Root Dialog: The main dialog which handles the routing of the requests, sends the welcome message and displays the results in a carousel form.
 
-- Menue Dialog: 
+- Menue Dialog: The Menu dialog allows the user to state his queries and then recognizes the intent behind these queries based on the LUIS service. This intent (and additional entities) are then used to apply a filter on the database. The result of this query is forwarded to the root dialog and then displayed.
 
-- Allergy Dialog: 
+- Allergy Dialog: The Allergy dialog lets the user type food allergies. These are then stored in a constant storage, so future filters results will take these allergies into account. After this dialog, the Menu dialog is called.
 
 ## Extension Capabilities ##
 
@@ -207,24 +215,55 @@ public static class LuisApi
 
 ### SQL Database and Properties ###
 
+- new property in AvailableFood
+- SQL Connector new reader and add to available food
+- 
+
 # Core Bot Capabilities #
 
-## API Callers ##
+## Database queries ##
 
-The Cafeteria bot and the LUIS API are used in the solution are connected to the bot with the following logic:
+The Cafeteria bot System.Data.SqlClient library to connect to the SQL database which contains all lunch options. The database contains properties which are used to generate the following "AvailableFood" object:
 
+```csharp
+public class AvailableFood
+{
+    public int Id { get; set; }
 
+    public string Location { get; set; }
+
+    public DateTime Date { get; set; }
+
+    public string Dishes { get; set; }
+
+    public decimal Price { get; set; }
+
+    public string ImageURL { get; set; }
+
+    public bool IsDailySpecial { get; set; }
+
+    public string Kitchen { get; set; }
+
+    public int Calories { get; set; }
+
+    public string Allergen { get; set; }
+
+    public string MenuUrl { get; set; }
+
+    public bool IsDailyDish { get; set; }
+}
+```
 
 ## Bot Intelligence ##
 
-The Cognitive Service called LUIS is used, to support the "free search" scenario. The query made by the user is send to the service, which then analyses it and specifies the intent of the query. The existing intents are:
+The Cognitive Service called LUIS is used, to support a free search and filtering scenario. The query made by the user is send to the service, which then analyses it and specifies the intent of the query. The existing intents are:
 
-- None: 
-- 1
-- 2
-- 3
-- 4
-- 5
+- **None**: No intent is recognized.
+- **menueLookUp.intent.showAllergies**: Shows food, which take the users allergies into account.
+- **menueLookUp.intent.showCalories**: Shows all food below a given kcal value.
+- **menueLookUp.intent.showCosts**: Displays all food below a given price.
+- **menueLookUp.intent.showMenue**: Shows all dishes based on a given cuisine (e.g. Italian)
+- **menueLookUp.intent.showVenues**: Displays all lunch options for a given location.
 
 The following [LUIS Bot Sample](https://github.com/Microsoft/BotBuilder-Samples/tree/master/CSharp/intelligence-LUIS) explains how to develop a LUIS bot.
 
@@ -239,17 +278,16 @@ The following technologies are used for the implementation of the application:
 
 # Conclusion #
 
-This section will briefly summarize the technical story with the following details included:
-
-
+The developed Cafeteria bot solution enables all users to have a simple, fast, intuitive and familiar visual interface to search and filter through the food available to them without having to sort through a variety of different documents and sources. Additionally, the effort to create this information is reduced, because the only source that needs to be updated now, is the SQL database.
 
 General lessons:
-
-  
+- LUIS needs around 10 or more samples for each intent to work as desired for some cases. To optimize the bot includes continuous training of the service.
+- To reduce bandwidth and the performance of the bot, it is better to apply the filters directly to the SQL queries, which are send to the database. This will reduce the amount of results obtained from the database.
 
 Next steps:
-
-The solution is the basis for further refinement of the bot and enables the Deutsche Telekom to offer their services with the channels now available through the Microsoft Bot Framework. This will be the next step for this developed solution.
+- Perform a internal beta testing, to optimize LUIS and check for additional needs.
+- Deploy the bot on more channels (current ones are Skype and Web)
+- Adapt bot to enable speech capabilities
 
 # Additional resources #
 In this section, include a list of links to resources that complement your story, including (but not limited to) the following:
@@ -262,4 +300,4 @@ In this section, include a list of links to resources that complement your story
 
 - [LUIS](https://www.luis.ai)
 
-- [Congitive Services](https://www.microsoft.com/cognitive-services)
+- [Cognitive Services](https://www.microsoft.com/cognitive-services)
