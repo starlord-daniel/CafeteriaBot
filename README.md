@@ -219,7 +219,24 @@ To add new dialogs to the system, e.g. to edit preferences the user has towards 
     - To create a new dialog, the developer has to add a class to the Dialogs folder, preferrably with the ending Dialog (e.g. PreferencesDialog). This class has to inherit from the IDialog interface and should in its unmodified state look like this:
 
     ```csharp
+    [Serializable]
+    public class PreferencesDialog : IDialog<List<object>>
+    {
+        public async Task StartAsync(IDialogContext context)
+        {
+            await context.PostAsync("Text");
+            context.Wait(MessageReceivedAsync);
+        }
 
+        private async Task MessageReceivedAsync(IDialogContext context, IAwaitable<IMessageActivity> result)
+        {
+            var message = await result;
+
+            // Do something
+
+            context.Done(message);
+        }
+    }
     ```
 
 2. Use the context.Done(result) function to send results of the dialog to the RootDialog.
