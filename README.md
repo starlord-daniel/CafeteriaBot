@@ -213,11 +213,28 @@ public static class LuisApi
 
 ### Dialogs ###
 
-### SQL Database and Properties ###
+To add new dialogs to the system, e.g. to edit preferences the user has towards food (Vegan, Vegetarian, ...) the developer has to perform the following steps:
 
-- new property in AvailableFood
-- SQL Connector new reader and add to available food
-- 
+1. Create a new dialog:
+    - To create a new dialog, the developer has to add a class to the Dialogs folder, preferrably with the ending Dialog (e.g. PreferencesDialog). This class has to inherit from the IDialog interface and should in its unmodified state look like this:
+
+    ```csharp
+
+    ```
+
+2. Use the context.Done(result) function to send results of the dialog to the RootDialog.
+
+3. Implement a DialogResumeAfter method for the newly created dialog in the RootDialog (e.g. PreferencesDialogResumeAfter)
+
+```csharp
+private async Task PreferencesDialogResumeAfter(IDialogContext context, IAwaitable<T> result) { ... }
+```
+
+4. Call the dialog via the context.Call() method like this from the RootDialog:
+
+```csharp
+context.Call(new PreferencesDialog(), this.PreferencesDialogResumeAfter);
+```
 
 # Core Bot Capabilities #
 
